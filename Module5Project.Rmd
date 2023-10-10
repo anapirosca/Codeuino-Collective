@@ -1,0 +1,68 @@
+---
+title: "Module 5 Report"
+author: "Coduino-Collective: Tara, Leticianna, Ana, Nicole"
+date: "2023-10-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Introduction 
+
+Our goal is to assess whether there is a correlation or impact between body temperature and activity level. Previous research has shown that intense exercise causes heat production in the core structures and activates muscles, with consequent massive transfer of warmed blood from internal to superficial parts of the body. Due to this, we hypothesize that increase in exercise will correlate with an increase in body temperature.
+
+# Methods 
+
+To measure body temperature, we programmed an Arduino UNO unit to measure and store temperature data using a sensor attached to the unit. Each group member measured their temperature over 100 seconds while sitting, then over 100 seconds while running up stairs. 
+
+# Results and Discussion 
+
+```{r, echo=FALSE, message = FALSE, fig.align ='center', fig.cap= "Fig1: Figure 1 depits a box plot for body temperature data of all group members performed while at rest and after one minute of activity (sitting on couch and one minute of running up the stairs). Means are denoted by black dot."}
+dat.f <- list.files(pattern = "Couch|Active.csv")
+
+dat.l <- list() 
+
+for(i in dat.f){
+  met.dat<- unlist(strsplit(i,"_")) 
+  who <- met.dat[1] 
+  activity <- gsub(".csv","",met.dat[2]) 
+  dat.l[[i]]<- read_csv(i)%>%
+    mutate(who=who,activity=activity) %>%
+    group_by(who, activity) %>% 
+    mutate(mean = mean(degC))
+}
+dat <- do.call(rbind,dat.l) 
+
+dat%>%
+  ggplot(aes(x=activity,y=degC))+geom_boxplot()+stat_summary(fun = "mean", geom = "point", shape = 20, size = 4, fill = "white")+facet_grid(.~who) 
+```
+
+Through comparison of all our data, we have determined that the level of exercise and body temperature is correlational to one another but can vary; it seems that increased activity correlates with higher body temperatures. However, Ana and Nicole's measurements showed the opposite, but this may be due because of differences in training, or due to Tara and Leticianna going in the order of couch then active, whereas Nicole and Ana went in the order of activer then couch, which would correlate to our findings in the cited article, which concluded that the level of physical training influences how fast skin temperature increases in response to localized exercise in female subjects.
+
+# Contributions 
+Nicole and Ana: Assembled Arduino sketch and hardware, found study about the effect of exercise in trained and untrained females, and cited article, wrote introduction and methods
+Tara and Leticianna: Created RMD and formatting of introduction, methods, wrote results and discussion, generated box plots 
+
+## R Markdown
+
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
